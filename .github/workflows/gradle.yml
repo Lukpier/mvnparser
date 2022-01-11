@@ -14,7 +14,7 @@ on:
     branches: [ main ]
     
 env:
-  BUILD_ARGS: gradle-7.1
+  BUILD_ARGS: "--gradle-version gradle-7.1"
 
 jobs:
   build:
