@@ -14,7 +14,7 @@ on:
     branches: [ main ]
     
 env:
-  BUILD_ARGS: "--gradle-version gradle-7.1"
+  GRADLE_VERSION: "gradle-7.1"
 
 jobs:
   build:
@@ -31,4 +31,5 @@ jobs:
     - name: Build with Gradle
       uses: gradle/gradle-build-action@4137be6a8bf7d7133955359dbd952c0ca73b1021
       with:
-        arguments: build $BUILD_ARGS
+        gradle-version: 6.5
+        arguments: build
