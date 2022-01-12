@@ -1,4 +1,4 @@
-package com.github.lukpier.techradar.mvnparser
+package com.github.lukpier.techradar.parser
 
 import com.fasterxml.jackson.annotation.JsonProperty
 
@@ -104,6 +104,16 @@ object Models {
         var name: String = "",
         var url: String = "",
     )
+
+
+    data class Requirements(
+        val requirements: List<Requirement>
+    )
+
+    data class Requirement(
+        val name: String // TODO: add version
+    )
+
 }
 
 

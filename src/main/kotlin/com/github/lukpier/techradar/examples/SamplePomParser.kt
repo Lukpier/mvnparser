@@ -1,6 +1,6 @@
 package com.github.lukpier.techradar.examples
 
-import com.github.lukpier.techradar.mvnparser.MvnParser
+import com.github.lukpier.techradar.parser.MvnParser
 
 fun main(args: Array<String>) {
 

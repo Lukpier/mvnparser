@@ -1,4 +1,4 @@
-package com.github.lukpier.techradar.mvnparser
+package com.github.lukpier.techradar.parser
 
 import com.fasterxml.jackson.databind.DeserializationFeature
 import com.fasterxml.jackson.databind.MapperFeature
@@ -22,7 +22,7 @@ import java.nio.charset.Charset
  * a string representation of the pom and an HTTP url pointing to that file.
  * @constructor Create empty Mvn parser
  */
-class MvnParser {
+class MvnParser : DependencyParser<Models.MavenProject> {
 
     private val xmlMapper = XmlMapper(JacksonXmlModule().apply {
         setDefaultUseWrapper(true)
@@ -40,7 +40,7 @@ class MvnParser {
      * @param value
      * @return MavenProject representation of that file
      */
-    fun parseValue(value: String): Models.MavenProject? =
+    override fun parseValue(value: String): Models.MavenProject? =
         runCatching { xmlMapper.readValue<Models.MavenProject>(value) }.getOrNull()
 
     /**
@@ -49,19 +49,9 @@ class MvnParser {
      * @param path
      * @return MavenProject representation of that file
      */
-    fun parse(path: String): Models.MavenProject? =
+    override fun parse(path: String): Models.MavenProject? =
         runCatching { FileInputStream(path).readBytes().toString(Charset.forName("UTF8")) }
             .mapCatching { file -> xmlMapper.readValue<Models.MavenProject>(file) }
-            .getOrNull()
-
-    /**
-     * Parse takes a pom file and returns its MavenProject representation.
-     *
-     * @param file
-     * @return MavenProject representation of that file
-     */
-    fun parse(file: File): Models.MavenProject? =
-        runCatching { xmlMapper.readValue<Models.MavenProject>(file) }
             .getOrNull()
 
     /**
@@ -70,7 +60,7 @@ class MvnParser {
      * @param file
      * @return MavenProject representation of that file
      */
-    suspend fun parseRemote(url: String): Models.MavenProject? =
+    override suspend fun parseRemote(url: String): Models.MavenProject? =
         runCatching {
             httpClient.request<HttpResponse>(url) {
                 method = HttpMethod.Get

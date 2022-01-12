@@ -1,4 +1,4 @@
-package com.github.lukpier.techradar.mvnparser
+package com.github.lukpier.techradar.parser
 
 import kotlinx.coroutines.runBlocking
 import org.junit.jupiter.api.Assertions.assertEquals
@@ -62,14 +62,6 @@ internal class MvnParserTest {
     fun parse() {
         val parser = MvnParser()
         val pom = parser.parse("src/test/resources/sample-pom.xml")
-        assertEquals(pom?.name, "demo")
-        assertEquals(pom?.dependencies?.size, 1)
-    }
-
-    @Test
-    fun parseFile() {
-        val parser = MvnParser()
-        val pom = parser.parse(File("src/test/resources/sample-pom.xml"))
         assertEquals(pom?.name, "demo")
         assertEquals(pom?.dependencies?.size, 1)
     }
