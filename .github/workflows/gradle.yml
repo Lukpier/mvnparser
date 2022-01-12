@@ -34,6 +34,7 @@ jobs:
         gradle-version: 7.1
         arguments: build
     - name: Test
+      uses: gradle/gradle-build-action@4137be6a8bf7d7133955359dbd952c0ca73b1021
       with:
         gradle-version: 7.1
         arguments: test
