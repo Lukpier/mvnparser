@@ -14,8 +14,6 @@ import io.ktor.http.*
 import io.ktor.http.cio.*
 import java.io.File
 import java.io.FileInputStream
-import java.net.URI
-import java.net.URL
 import java.nio.charset.Charset
 
 /**
@@ -42,9 +40,8 @@ class MvnParser {
      * @param value
      * @return MavenProject representation of that file
      */
-    fun parseValue(value: String): Models.MavenProject? {
-        return xmlMapper.readValue(value)
-    }
+    fun parseValue(value: String): Models.MavenProject? =
+        runCatching { xmlMapper.readValue<Models.MavenProject>(value) }.getOrNull()
 
     /**
      * Parse takes a path, read the file from local filesystem.
@@ -52,10 +49,10 @@ class MvnParser {
      * @param path
      * @return MavenProject representation of that file
      */
-    fun parse(path: String): Models.MavenProject? {
-        val file = FileInputStream(path).readBytes().toString(Charset.forName("UTF8"))
-        return xmlMapper.readValue(file)
-    }
+    fun parse(path: String): Models.MavenProject? =
+        runCatching { FileInputStream(path).readBytes().toString(Charset.forName("UTF8")) }
+            .mapCatching { file -> xmlMapper.readValue<Models.MavenProject>(file) }
+            .getOrNull()
 
     /**
      * Parse takes a pom file and returns its MavenProject representation.
@@ -63,9 +60,9 @@ class MvnParser {
      * @param file
      * @return MavenProject representation of that file
      */
-    fun parse(file: File): Models.MavenProject? {
-        return xmlMapper.readValue(file)
-    }
+    fun parse(file: File): Models.MavenProject? =
+        runCatching { xmlMapper.readValue<Models.MavenProject>(file) }
+            .getOrNull()
 
     /**
      * Parse takes a URL pointing to a pom file and returns its MavenProject representation.
@@ -73,17 +70,13 @@ class MvnParser {
      * @param file
      * @return MavenProject representation of that file
      */
-    suspend fun parseRemote(url: String): Models.MavenProject? {
-        val response = httpClient.request<HttpResponse>(url) {
-            method = HttpMethod.Get
-        }
-
-        if (response.status == HttpStatusCode.OK) {
-            val body: String = response.receive()
-            return xmlMapper.readValue(body)
-        }
-
-        return null;
-    }
+    suspend fun parseRemote(url: String): Models.MavenProject? =
+        runCatching {
+            httpClient.request<HttpResponse>(url) {
+                method = HttpMethod.Get
+            }
+        }.mapCatching { response ->
+            xmlMapper.readValue<Models.MavenProject>(response.receive<String>())
+        }.getOrNull()
 
 }
