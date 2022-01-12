@@ -1,13 +1,10 @@
 package com.github.lukpier.techradar.mvnparser
 
 import kotlinx.coroutines.runBlocking
+import org.junit.jupiter.api.Assertions.assertEquals
 import org.junit.jupiter.api.Test
-
-import org.junit.jupiter.api.Assertions.*
 import java.io.File
-import java.io.FileInputStream
-import java.net.URI
-import java.net.URL
+import kotlin.test.assertNull
 
 internal class MvnParserTest {
 
@@ -81,11 +78,23 @@ internal class MvnParserTest {
     fun parseRemote() {
         val parser = MvnParser()
         runBlocking {
-            parser.parseRemote("https://raw.githubusercontent.com/openjfx/samples/master/HelloFX/Maven/hellofx/pom.xml")
+                parser.parseRemote("https://raw.githubusercontent.com/openjfx/samples/master/HelloFX/Maven/hellofx/pom.xml")
+                    .apply {
+                        assertEquals(this?.name, "demo")
+                        assertEquals(this?.dependencies?.size, 1)
+                    }
+            }
+    }
+
+    @Test
+    fun parseRemote_whenNotFound_returnNull() {
+        val parser = MvnParser()
+        runBlocking {
+            parser.parseRemote("https://raw.githubusercontent.com/openjfx/samples/fake")
                 .apply {
-                    assertEquals(this?.name, "demo")
-                    assertEquals(this?.dependencies?.size, 1)
+                    assertNull(this)
                 }
         }
     }
+
 }
