@@ -6,8 +6,16 @@ import com.fasterxml.jackson.dataformat.xml.JacksonXmlModule
 import com.fasterxml.jackson.dataformat.xml.XmlMapper
 import com.fasterxml.jackson.module.kotlin.readValue
 import com.fasterxml.jackson.module.kotlin.registerKotlinModule
+import io.ktor.client.*
+import io.ktor.client.call.*
+import io.ktor.client.request.*
+import io.ktor.client.statement.*
+import io.ktor.http.*
+import io.ktor.http.cio.*
 import java.io.File
 import java.io.FileInputStream
+import java.net.URI
+import java.net.URL
 import java.nio.charset.Charset
 
 /**
@@ -26,13 +34,15 @@ class MvnParser {
             enable(MapperFeature.ACCEPT_CASE_INSENSITIVE_PROPERTIES)
         }
 
+    private val httpClient = HttpClient()
+
     /**
      * Parse takes the string representation of the pom file.
      *
      * @param value
      * @return MavenProject representation of that file
      */
-    fun parseValue(value: String): Models.MavenProject {
+    fun parseValue(value: String): Models.MavenProject? {
         return xmlMapper.readValue(value)
     }
 
@@ -42,7 +52,7 @@ class MvnParser {
      * @param path
      * @return MavenProject representation of that file
      */
-    fun parse(path: String): Models.MavenProject {
+    fun parse(path: String): Models.MavenProject? {
         val file = FileInputStream(path).readBytes().toString(Charset.forName("UTF8"))
         return xmlMapper.readValue(file)
     }
@@ -53,8 +63,27 @@ class MvnParser {
      * @param file
      * @return MavenProject representation of that file
      */
-    fun parse(file: File): Models.MavenProject {
+    fun parse(file: File): Models.MavenProject? {
         return xmlMapper.readValue(file)
+    }
+
+    /**
+     * Parse takes a URL pointing to a pom file and returns its MavenProject representation.
+     *
+     * @param file
+     * @return MavenProject representation of that file
+     */
+    suspend fun parseRemote(url: String): Models.MavenProject? {
+        val response = httpClient.request<HttpResponse>(url) {
+            method = HttpMethod.Get
+        }
+
+        if (response.status == HttpStatusCode.OK) {
+            val body: String = response.receive()
+            return xmlMapper.readValue(body)
+        }
+
+        return null;
     }
 
 }

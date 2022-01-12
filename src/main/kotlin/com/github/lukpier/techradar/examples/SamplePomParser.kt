@@ -8,7 +8,7 @@ fun main(args: Array<String>) {
     val parser = MvnParser()
     val project = parser.parse(path)
     println(project)
-    println(project.dependencies)
-    println(project.removePlaceHolderVersions().dependencies)
+    println(project?.dependencies)
+    println(project?.removePlaceHolderVersions()?.dependencies)
 
 }

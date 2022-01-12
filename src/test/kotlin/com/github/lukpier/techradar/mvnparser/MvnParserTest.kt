@@ -1,10 +1,13 @@
 package com.github.lukpier.techradar.mvnparser
 
+import kotlinx.coroutines.runBlocking
 import org.junit.jupiter.api.Test
 
 import org.junit.jupiter.api.Assertions.*
 import java.io.File
 import java.io.FileInputStream
+import java.net.URI
+import java.net.URL
 
 internal class MvnParserTest {
 
@@ -53,8 +56,8 @@ internal class MvnParserTest {
         """.trimIndent()
         val parser = MvnParser()
         val pom = parser.parseValue(raw)
-        assertEquals(pom.name, "demo")
-        assertEquals(pom.dependencies.size, 1)
+        assertEquals(pom?.name, "demo")
+        assertEquals(pom?.dependencies?.size, 1)
 
     }
 
@@ -62,15 +65,27 @@ internal class MvnParserTest {
     fun parse() {
         val parser = MvnParser()
         val pom = parser.parse("src/test/resources/sample-pom.xml")
-        assertEquals(pom.name, "demo")
-        assertEquals(pom.dependencies.size, 1)
+        assertEquals(pom?.name, "demo")
+        assertEquals(pom?.dependencies?.size, 1)
     }
 
     @Test
     fun parseFile() {
         val parser = MvnParser()
         val pom = parser.parse(File("src/test/resources/sample-pom.xml"))
-        assertEquals(pom.name, "demo")
-        assertEquals(pom.dependencies.size, 1)
+        assertEquals(pom?.name, "demo")
+        assertEquals(pom?.dependencies?.size, 1)
+    }
+
+    @Test
+    fun parseRemote() {
+        val parser = MvnParser()
+        runBlocking {
+            parser.parseRemote("https://raw.githubusercontent.com/openjfx/samples/master/HelloFX/Maven/hellofx/pom.xml")
+                .apply {
+                    assertEquals(this?.name, "demo")
+                    assertEquals(this?.dependencies?.size, 1)
+                }
+        }
     }
 }
