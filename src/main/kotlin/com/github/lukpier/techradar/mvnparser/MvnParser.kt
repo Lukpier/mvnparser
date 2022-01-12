@@ -9,7 +9,6 @@ import com.fasterxml.jackson.module.kotlin.registerKotlinModule
 import java.io.File
 import java.io.FileInputStream
 import java.nio.charset.Charset
-import java.nio.file.Path
 
 /**
  * Mvn parser
